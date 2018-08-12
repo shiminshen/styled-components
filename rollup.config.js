@@ -160,6 +160,72 @@ const browserProdConfig = Object.assign({}, configBase, browserConfig, {
   ),
 })
 
+const noTagsPath = './src/index-without-tags.js'
+
+const noTagServerConfig = Object.assign({}, configBase, {
+  input: noTagsPath,
+  output: [
+    getESM({ file: 'dist/styled-components-no-tags.esm.js' }),
+    getCJS({ file: 'dist/styled-components-no-tags.cjs.js' }),
+  ],
+  plugins: configBase.plugins.concat(
+    replace({
+      __SERVER__: JSON.stringify(true),
+    })
+  ),
+})
+
+const noTagServerProdConfig = Object.assign({}, configBase, serverConfig, {
+  input: noTagsPath,
+  output: [
+    getESM({ file: 'dist/styled-components-no-tags.esm.min.js' }),
+    getCJS({ file: 'dist/styled-components-no-tags.cjs.min.js' }),
+  ],
+  plugins: serverConfig.plugins.concat(
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+    terser({
+      sourceMap: true,
+    })
+  ),
+})
+
+const noTagBrowserConfig = Object.assign({}, configBase, {
+  input: noTagsPath,
+  output: [
+    getESM({ file: 'dist/styled-components-no-tags.browser.esm.js' }),
+    getCJS({ file: 'dist/styled-components-no-tags.browser.cjs.js' }),
+  ],
+  plugins: configBase.plugins.concat(
+    replace(
+      Object.assign({}, ignore, {
+        __SERVER__: JSON.stringify(false),
+      })
+    )
+  ),
+})
+
+const noTagBrowserProdConfig = Object.assign({}, configBase, browserConfig, {
+  input: noTagsPath,
+  output: [
+    getESM({
+      file: 'dist/styled-components-no-tags.browser.esm.min.js',
+    }),
+    getCJS({
+      file: 'dist/styled-components-no-tags.browser.cjs.min.js',
+    }),
+  ],
+  plugins: browserConfig.plugins.concat(
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+    terser({
+      sourceMap: true,
+    })
+  ),
+})
+
 const nativeConfig = Object.assign({}, configBase, {
   input: './src/native/index.js',
   output: getCJS({
@@ -189,6 +255,10 @@ export default [
   serverProdConfig,
   browserConfig,
   browserProdConfig,
+  noTagServerConfig,
+  noTagServerProdConfig,
+  noTagBrowserConfig,
+  noTagBrowserProdConfig,
   nativeConfig,
   primitivesConfig,
 ]
