@@ -112,21 +112,6 @@ const serverConfig = Object.assign({}, configBase, {
   ),
 })
 
-const serverProdConfig = Object.assign({}, configBase, serverConfig, {
-  output: [
-    getESM({ file: 'dist/styled-components.esm.min.js' }),
-    getCJS({ file: 'dist/styled-components.cjs.min.js' }),
-  ],
-  plugins: serverConfig.plugins.concat(
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    terser({
-      sourceMap: true,
-    })
-  ),
-})
-
 const browserConfig = Object.assign({}, configBase, {
   output: [
     getESM({ file: 'dist/styled-components.browser.esm.js' }),
@@ -138,25 +123,6 @@ const browserConfig = Object.assign({}, configBase, {
         __SERVER__: JSON.stringify(false),
       })
     )
-  ),
-})
-
-const browserProdConfig = Object.assign({}, configBase, browserConfig, {
-  output: [
-    getESM({
-      file: 'dist/styled-components.browser.esm.min.js',
-    }),
-    getCJS({
-      file: 'dist/styled-components.browser.cjs.min.js',
-    }),
-  ],
-  plugins: browserConfig.plugins.concat(
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    terser({
-      sourceMap: true,
-    })
   ),
 })
 
@@ -175,22 +141,6 @@ const noTagServerConfig = Object.assign({}, configBase, {
   ),
 })
 
-const noTagServerProdConfig = Object.assign({}, configBase, serverConfig, {
-  input: noTagsPath,
-  output: [
-    getESM({ file: 'dist/styled-components-no-tags.esm.min.js' }),
-    getCJS({ file: 'dist/styled-components-no-tags.cjs.min.js' }),
-  ],
-  plugins: serverConfig.plugins.concat(
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    terser({
-      sourceMap: true,
-    })
-  ),
-})
-
 const noTagBrowserConfig = Object.assign({}, configBase, {
   input: noTagsPath,
   output: [
@@ -203,26 +153,6 @@ const noTagBrowserConfig = Object.assign({}, configBase, {
         __SERVER__: JSON.stringify(false),
       })
     )
-  ),
-})
-
-const noTagBrowserProdConfig = Object.assign({}, configBase, browserConfig, {
-  input: noTagsPath,
-  output: [
-    getESM({
-      file: 'dist/styled-components-no-tags.browser.esm.min.js',
-    }),
-    getCJS({
-      file: 'dist/styled-components-no-tags.browser.cjs.min.js',
-    }),
-  ],
-  plugins: browserConfig.plugins.concat(
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-    }),
-    terser({
-      sourceMap: true,
-    })
   ),
 })
 
@@ -252,13 +182,9 @@ export default [
   umdConfig,
   umdProdConfig,
   serverConfig,
-  serverProdConfig,
   browserConfig,
-  browserProdConfig,
   noTagServerConfig,
-  noTagServerProdConfig,
   noTagBrowserConfig,
-  noTagBrowserProdConfig,
   nativeConfig,
   primitivesConfig,
 ]
