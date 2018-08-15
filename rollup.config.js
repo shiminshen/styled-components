@@ -7,6 +7,7 @@ import json from 'rollup-plugin-json'
 import flow from 'rollup-plugin-flow'
 import { terser } from 'rollup-plugin-terser'
 import sourceMaps from 'rollup-plugin-sourcemaps'
+import pkg from './package.json'
 
 // rollup-plugin-ignore stopped working, so we'll just remove the import line 😐
 const ignore = { "import stream from 'stream';": "'';" }
@@ -45,6 +46,7 @@ const commonPlugins = [
   }),
   replace({
     __DEV__: JSON.stringify(false), // disable flag indicating a Jest run
+    __VERSION__: JSON.stringify(pkg.version),
   }),
 ]
 
