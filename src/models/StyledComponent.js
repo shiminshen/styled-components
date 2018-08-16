@@ -7,7 +7,6 @@ import determineTheme from '../utils/determineTheme'
 import escape from '../utils/escape'
 import generateDisplayName from '../utils/generateDisplayName'
 import getComponentName from '../utils/getComponentName'
-import isStyledComponent from '../utils/isStyledComponent'
 import isTag from '../utils/isTag'
 import validAttr from '../utils/validAttr'
 import hasInInheritanceChain from '../utils/hasInInheritanceChain'
@@ -81,7 +80,6 @@ class BaseStyledComponent extends Component<*> {
   }
 
   renderInner(theme?: Theme) {
-    const { innerRef } = this.props
     const {
       styledComponentId,
       target,
@@ -113,7 +111,21 @@ class BaseStyledComponent extends Component<*> {
       )
     }
 
-    const className = [
+    const propsForElement: Object = { ...this.attrs }
+
+    let key
+    for (key in this.props) {
+      if (key === 'forwardedRef') propsForElement.ref = this.props[key]
+      // Don't pass through non HTML tags through to HTML elements
+      else if (!isTargetTag || validAttr(key)) {
+        propsForElement[key] =
+          key === 'style' && key in this.attrs
+            ? { ...this.attrs[key], ...this.props[key] }
+            : this.props[key]
+      }
+    }
+
+    propsForElement.className = [
       this.props.className,
       styledComponentId,
       this.attrs.className,
@@ -121,35 +133,6 @@ class BaseStyledComponent extends Component<*> {
     ]
       .filter(Boolean)
       .join(' ')
-
-    const baseProps: Object = {
-      ...this.attrs,
-      className,
-    }
-
-    if (isStyledComponent(target)) {
-      baseProps.innerRef = innerRef
-    } else {
-      baseProps.ref = innerRef
-    }
-
-    const propsForElement = baseProps
-
-    let key
-    for (key in this.props) {
-      // Don't pass through non HTML tags through to HTML elements
-      // always omit innerRef
-      if (
-        key !== 'innerRef' &&
-        key !== 'className' &&
-        (!isTargetTag || validAttr(key))
-      ) {
-        propsForElement[key] =
-          key === 'style' && key in this.attrs
-            ? { ...this.attrs[key], ...this.props[key] }
-            : this.props[key]
-      }
-    }
 
     return createElement(target, propsForElement)
   }
@@ -277,7 +260,9 @@ export default (ComponentStyle: Function) => {
       })
     }
 
-    return StyledComponent
+    return React.forwardRef((props, ref) => (
+      <StyledComponent {...props} forwardedRef={ref} />
+    ))
   }
 
   return createStyledComponent

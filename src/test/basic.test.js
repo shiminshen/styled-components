@@ -135,21 +135,18 @@ describe('basic', () => {
       const Comp = styled.div``
 
       class Wrapper extends Component<*, *> {
-        testRef: any
-        innerRef = comp => {
-          this.testRef = comp
-        }
+        testRef: any = React.createRef()
 
         render() {
-          return <Comp innerRef={this.innerRef} />
+          return <Comp ref={this.testRef} />
         }
       }
 
       const wrapper = mount(<Wrapper />)
       const component = wrapper.find(Comp).first()
 
-      expect(wrapper.instance().testRef).toBe(component.getDOMNode())
-      expect(component.find('div').prop('innerRef')).toBeFalsy()
+      expect(wrapper.instance().testRef.value).toBe(component.getDOMNode())
+      expect(component.find('div').prop('ref')).toBeFalsy()
     })
 
     class InnerComponent extends Component<*, *> {
@@ -157,30 +154,6 @@ describe('basic', () => {
         return null
       }
     }
-
-    it('should not leak the innerRef prop to the wrapped child', () => {
-      const OuterComponent = styled(InnerComponent)``
-
-      class Wrapper extends Component<*, *> {
-        testRef: any
-
-        render() {
-          return (
-            <OuterComponent
-              innerRef={comp => {
-                this.testRef = comp
-              }}
-            />
-          )
-        }
-      }
-
-      const wrapper = mount(<Wrapper />)
-      const innerComponent = wrapper.find(InnerComponent).first()
-
-      expect(wrapper.instance().testRef).toBe(innerComponent.instance())
-      expect(innerComponent.prop('innerRef')).toBeFalsy()
-    })
 
     it('should pass the full className to the wrapped child', () => {
       const OuterComponent = styled(InnerComponent)``
@@ -195,18 +168,15 @@ describe('basic', () => {
       expect(wrapper.find(InnerComponent).prop('className')).toBe('test sc-a b')
     })
 
-    it('should pass the innerRef to the wrapped styled component', () => {
+    it('should pass the ref to the wrapped styled component', () => {
       const InnerComponent = styled.div``
       const OuterComponent = styled(InnerComponent)``
 
       class Wrapper extends Component<*, *> {
-        testRef: any
-        innerRef = comp => {
-          this.testRef = comp
-        }
+        testRef: any = React.createRef()
 
         render() {
-          return <OuterComponent innerRef={this.innerRef} />
+          return <OuterComponent ref={this.testRef} />
         }
       }
 
@@ -215,9 +185,8 @@ describe('basic', () => {
       const outerComponent = wrapper.find(OuterComponent).first()
       const wrapperNode = wrapper.instance()
 
-      expect(wrapperNode.testRef).toBe(innerComponent.getDOMNode())
-
-      expect(innerComponent.prop('innerRef')).toBe(wrapperNode.innerRef)
+      expect(wrapperNode.testRef.value).toBe(innerComponent.getDOMNode())
+      expect(innerComponent.prop('ref')).toBe(wrapperNode.ref)
     })
 
     it('should respect the order of StyledComponent creation for CSS ordering', () => {
